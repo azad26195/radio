@@ -9,7 +9,6 @@ import cascading.operation.Function;
 import cascading.operation.aggregator.Count;
 import cascading.operation.FunctionCall;
 import cascading.operation.assertion.AssertExpression;
-import cascading.operation.regex.RegexParser;
 import cascading.operation.text.DateParser;
 import cascading.pipe.Each;
 import cascading.pipe.Every;
@@ -63,7 +62,7 @@ public class Main{
 
 		groupByPipe = 	new GroupBy(groupByPipe, new Fields("sensorid"),new Fields("serverts"));
 
-		groupByPipe = new Every(groupByPipe,tupleField,new ServerBuffer(),new Fields("sensorid","range","status"));
+		groupByPipe = new Every(groupByPipe,tupleField,new ServerBuffer(),Fields.RESULTS);
 
 		FlowDef flowDef = FlowDef.flowDef().addSource(processPipe, inTap).addTailSink(groupByPipe,outTap);
 		Flow wcFlow = flowConnector.connect(flowDef);

@@ -51,6 +51,21 @@ public class ServerBuffer extends BaseOperation implements Buffer
     super( 1, fieldDeclaration );
   }
 
+  public Date toDateString(String timestampString){
+
+      Long timestamp = new Long(timestampString.trim());
+      Date date = new Date(timestamp*1000L); // *1000 is to convert seconds to milliseconds
+      // SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); // the format of your date
+      // sdf.setTimeZone(DateTimeZone.UTC); // give a timezone reference for formating (see comment at the bottom
+      // Date formattedDate = sdf.format(date);
+
+      return date;
+
+    }
+
+    public String HHMM(String timestampString){
+      
+    }
 
 
   public void operate( FlowProcess flowProcess, BufferCall bufferCall )
@@ -61,12 +76,16 @@ public class ServerBuffer extends BaseOperation implements Buffer
 
     // get all the current argument values for this grouping
 
-    String startTime = "";
-    String currentTime = "";
-    String endTime = "";
+    String startTimeString = "";
+    String currentTimeString = "";
+    String endTimeString = "";
     String currentStatus = "ON";
-    int isStatusChange = 0;
+    boolean isStatusChange = false;
     boolean isFirstTime = true;
+
+    Date endTime = new Date();
+    Date currentTime = new  Date();
+
 
     Iterator<TupleEntry> arguments = bufferCall.getArgumentsIterator();
 
@@ -77,39 +96,45 @@ public class ServerBuffer extends BaseOperation implements Buffer
 
     if(arguments.hasNext() & isFirstTime){
       currentSensor = arguments.next();
-      startTime =  currentSensor.getString(2);
+      startTimeString =  currentSensor.getString(2);
       currentSensor = arguments.next();
-      endTime = currentSensor.getString(2);
-      currentTime = startTime;
+      endTimeString = currentSensor.getString(2);
+      currentTimeString = startTimeString;
     }
 
     while( arguments.hasNext())
     {
       isFirstTime = false;
+
+
+
+      currentTime =toDateString(currentTimeString);
+      endTime = toDateString(endTimeString);
       
 
-      if(( LocalDate.parse(endTime).getLocalMillis() - LocalDate.parse(currentTime).getLocalMillis() ) < 5000 ){
+      if((endTime.getTime() - currentTime.getTime() ) < 2000){
         currentSensor = arguments.next();
-        currentTime = endTime;
-        endTime  = currentSensor.getString(2);
+        currentTimeString = endTimeString;
+        endTimeString  = currentSensor.getString(2);
 
-        isStatusChange = 0;
+        isStatusChange = false;
 
       }
       else{
 
-        sensorList.add(new SensorStatus(startTime ,endTime,currentStatus));
+        sensorList.add(new SensorStatus(startTimeString ,endTimeString,currentStatus));
 
-        isStatusChange = 1;
+
+        isStatusChange = true;
       }
 
       if(isStatusChange){
         currentSensor = arguments.next();
-        endTime = currentSensor.getString(2);
-       startTime = currentTime;
+        endTimeString = currentSensor.getString(2);
+       startTimeString = currentTimeString;
 
-       isStatusChange = 0;
-       currentStatus = "OFF";
+       isStatusChange = false;
+       currentStatus = (currentStatus == "OFF")?"ON":"OFF";
 
      }
 
@@ -118,14 +143,15 @@ public class ServerBuffer extends BaseOperation implements Buffer
 
    isFirstTime = false;
 
-   Iterator<ArrayList> resultList = sensorList.iterator();
+   Iterator<SensorStatus> resultList = sensorList.iterator();
 
-    // while(resultList.hasNext()){
-    //   SensorStatus results = resultList.next()
-    //   Tuple result = new Tuple(arguments,results.from + " - " + results.to , ;
-    //   bufferCall.getOutputCollector().add(result);
+    while(resultList.hasNext()){
+      SensorStatus results = resultList.next();
+      System.out.println(results.from);
+      Tuple result = new Tuple(currentSensor.getString(1), "", results.status) ;
+      bufferCall.getOutputCollector().add(result);
 
-    // }
+    }
     // // create a Tuple to hold our result values
 
     // return the result Tuple

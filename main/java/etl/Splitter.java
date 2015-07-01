@@ -43,18 +43,11 @@ public class  Splitter extends BaseOperation implements Function
     // get the arguments TupleEntry
 			TupleEntry arguments = functionCall.getArguments();
 			String[] tokens = arguments.getString(0).split(",");
-			Long timestamp = new Long(tokens[2].trim());
-			Date date = new Date(timestamp*1000L); // *1000 is to convert seconds to milliseconds
-			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); // the format of your date
-			sdf.setTimeZone(TimeZone.getTimeZone("GMT+05:30")); // give a timezone reference for formating (see comment at the bottom
-			String formattedDate = sdf.format(date);
-			// System.out.println(formattedDate);
-			// DateTime date = new DateTime(timestamp);	
-
-
-			// SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			// String s = formatter.format(date);
-
+			// Long timestamp = new Long(tokens[2].trim());
+			// Date date = new Date(timestamp*1000L); // *1000 is to convert seconds to milliseconds
+			// SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); // the format of your date
+			// sdf.setTimeZone(TimeZone.getTimeZone("GMT")); // give a timezone reference for formating (see comment at the bottom
+			// String formattedDate = sdf.format(date);
 
 			// Timestamp timestamp = new Timestamp(Long.parseLong(tokens[2]));
 			// Date date = new Date(timestamp.getTime());
@@ -66,7 +59,7 @@ public class  Splitter extends BaseOperation implements Function
 			result.add(tokens[0]);
 			result.add(tokens[1]);
 
-			result.add(formattedDate);
+			result.add(tokens[2]);
 
     // insert some values into the result Tuple
 
