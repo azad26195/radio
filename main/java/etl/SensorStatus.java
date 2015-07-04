@@ -6,11 +6,10 @@ public class SensorStatus{
 	public String status = "";
 	public Long diff;
 
-	public  SensorStatus(String from,String to, Long diff, String status){
+	public  SensorStatus(String from,String to, String status){
 	 	this.from = from;
 		this.to = to;
 		this.status = status;
-		this.diff = diff;
 	}
 
 }
